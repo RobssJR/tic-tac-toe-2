@@ -12,6 +12,7 @@ base = [[0,0,0],
 
 valor_pecas = {'P': 1, 'M': 2, 'G': 3}
 
+
 class Jogador():
     def __init__(self, name: str):
         self.name = name
@@ -19,41 +20,31 @@ class Jogador():
 
     def fazerJogada(self, peca, linha, coluna):
         if peca in self.mao:
-            if tabuleiro[linha][coluna] == 0:
-                tabuleiro[linha][coluna] = f'{self.name[0]}-{peca}'
-                self.mao.remove(peca)
-                return True
-            else:
-                reserva = tabuleiro[linha][coluna]
-
-                for i in range(0,2):
-                    tabuleiro[linha][coluna] = tabuleiro[linha][coluna].replace(f'{tabuleiro[linha][coluna][0]}','')
-                    print(tabuleiro)
-                    input()
-                if valor_pecas[peca] > valor_pecas[tabuleiro[linha][coluna]]:
+            try:
+                if tabuleiro[linha][coluna] == 0:
                     tabuleiro[linha][coluna] = f'{self.name[0]}-{peca}'
                     self.mao.remove(peca)
                     return True
                 else:
-                    tabuleiro[linha][coluna] = reserva
-                    print('Essa peça é menor')
-                    input()
+                    reserva = tabuleiro[linha][coluna]
+                    tabuleiro[linha][coluna] = tabuleiro[linha][coluna].replace(f'{tabuleiro[linha][coluna][0:2]}','') #Remove a inicial
+
+                    if valor_pecas[peca] > valor_pecas[tabuleiro[linha][coluna]]:
+                        tabuleiro[linha][coluna] = f'{self.name[0]}-{peca}'
+                        self.mao.remove(peca)
+                        return True
+                    else:
+                        tabuleiro[linha][coluna] = reserva
+                        print('Essa peça é menor')
+                        input()
+
+            except IndexError:
+                print('Valores de linha e coluna invalidos')
+                input()
         else:
-            print('Não tem mais a peça')
+            print('Peça invalida')
             input()
             return False
-        
-
-class Pecas():
-    def __init__(self, valor: int):
-        self.valor = valor
-        
-        if self.valor == 1:
-            self.name = 'P'
-        elif self.valor == 2:
-            self.name = 'M'
-        else:
-            self.name = 'G'
 
 
 player1 = Jogador(str(input('Jogador 1: ')).title())
@@ -61,7 +52,8 @@ player2 = Jogador(str(input('Jogador 2: ')).title())
 
 jogadores = [player1,player2]
 
-def desenharTela():
+
+def desenharTela(): #Função para desenhar o tabuleiro na tela
     system('cls')
     for i in range(3):
         for j in range(3):
@@ -73,12 +65,13 @@ def desenharTela():
         print('\n')
 
     for j in jogadores:
-        print(f"Peças do {j.name}: {' '.join(j.mao)}")
+        print(f"Peças {j.name}: {' '.join(j.mao)}")
 
 
-def game(vez):
+def game(vez): #Função principal para a logica do jogo (Ela desenha e pega a entrada do usuario)
     while True:
         desenharTela()
+
         try:
             peca = input(f"\nPeça da mão {vez.name}: ").upper()
             linha  = int(input("Linha: ")) - 1
@@ -111,6 +104,7 @@ def verificarGanhador():
 
 jogada = 1
 
+
 if __name__ == "__main__":
     while True:
         if jogada == 1:
@@ -118,7 +112,7 @@ if __name__ == "__main__":
         else:
             vez = jogadores[1]
         
-        game(vez)
+        game(vez) #Roda até a jogada ser feita
 
         if verificarGanhador():
             print(f'{vez.name} GANHOU')
